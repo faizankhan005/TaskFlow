@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Task Manager with Progress Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/tailwind.js"></script> 
+    <link href="styles/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white scroll-smooth">
+    <!-- Navigation Header -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo Section -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-lg">
+                        <i class="fas fa-tasks text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        TaskFlow
+                    </span>
+                </div>
+
+                <!-- Desktop Navigation Menu -->
+                <ul class="hidden md:flex space-x-8">
+                    <li><a href="#" class="nav-link active px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200" data-page="home">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a></li>
+                    <li><a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200" data-page="tasks">
+                        <i class="fas fa-tasks mr-2"></i>Tasks
+                    </a></li>
+                    <li><a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200" data-page="progress">
+                        <i class="fas fa-chart-line mr-2"></i>Progress
+                    </a></li>
+                    <li><a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200" data-page="analytics">
+                        <i class="fas fa-analytics mr-2"></i>Analytics
+                    </a></li>
+                    <li><a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors duration-200" data-page="about">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a></li>
+                </ul>
+
+                <!-- Auth Buttons -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200" id="login-btn">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200" id="register-btn">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200 hidden" id="logout-btn">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <div class="md:hidden">
+                    <button class="text-gray-300 hover:text-white p-2" id="nav-toggle">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 bg-black/20 rounded-lg mt-2">
+                    <a href="#" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors duration-200" data-page="home">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <a href="#" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors duration-200" data-page="tasks">
+                        <i class="fas fa-tasks mr-2"></i>Tasks
+                    </a>
+                    <a href="#" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors duration-200" data-page="progress">
+                        <i class="fas fa-chart-line mr-2"></i>Progress
+                    </a>
+                    <a href="#" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors duration-200" data-page="analytics">
+                        <i class="fas fa-analytics mr-2"></i>Analytics
+                    </a>
+                    <a href="#" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors duration-200" data-page="about">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a>
+                    <div class="pt-4 pb-3 border-t border-gray-700">
+                        <div class="flex flex-col space-y-2 px-3">
+                            <button class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200" id="mobile-login-btn">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                            </button>
+                            <button class="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200" id="mobile-register-btn">
+                                <i class="fas fa-user-plus mr-2"></i>Register
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="pt-16" id="main-content">
+        <!-- Home Page -->
+        <div class="page transition-opacity duration-500" id="home-page">
+            <!-- Hero Section -->
+            <section class="min-h-screen bg-mesh flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-blue-900/20"></div>
+                
+                <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+                    <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold mb-6 animate-fade-in">
+                        <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                            TaskFlow
+                        </span>
+                    </h1>
+                    <p class="text-xl sm:text-2xl text-gray-300 mb-8 animate-fade-in" style="animation-delay: 0.2s;">
+                        Manage Tasks • Track Progress • Boost Productivity
+                    </p>
+                    <button class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-full text-lg font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl animate-bounce-gentle" id="get-started-btn">
+                        <i class="fas fa-rocket mr-3"></i>Get Started
+                    </button>
+                </div>
+
+                <!-- Scrolling Images -->
+                <div class="absolute bottom-20 left-0 right-0 overflow-hidden">
+                    <div class="flex animate-scroll-x space-x-8">
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                            <span class="text-white font-medium">Complete Tasks</span>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-chart-bar text-blue-400 text-xl"></i>
+                            <span class="text-white font-medium">Track Progress</span>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                            <span class="text-white font-medium">Time Management</span>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-trophy text-orange-400 text-xl"></i>
+                            <span class="text-white font-medium">Achieve Goals</span>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-lightbulb text-purple-400 text-xl"></i>
+                            <span class="text-white font-medium">Get Insights</span>
+                        </div>
+                        <!-- Duplicate for seamless loop -->
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                            <span class="text-white font-medium">Complete Tasks</span>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-white/10 rounded-full px-6 py-3 backdrop-blur-sm whitespace-nowrap">
+                            <i class="fas fa-chart-bar text-blue-400 text-xl"></i>
+                            <span class="text-white font-medium">Track Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="py-20 bg-gray-800">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Why Choose TaskFlow?
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="bg-gradient-to-br from-purple-900/50 to-blue-900/50 p-6 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-purple-500/50 transition-all duration-300 transform hover:scale-105 floating-animation">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-tasks text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Task Management</h3>
+                            <p class="text-gray-300">Add, edit, complete, and delete tasks with ease. Organize your daily workflow efficiently.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-900/50 to-cyan-900/50 p-6 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 floating-animation" style="animation-delay: 0.5s;">
+                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-chart-line text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Progress Tracking</h3>
+                            <p class="text-gray-300">Visualize your progress with interactive charts and detailed analytics.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-green-900/50 to-teal-900/50 p-6 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-green-500/50 transition-all duration-300 transform hover:scale-105 floating-animation" style="animation-delay: 1s;">
+                            <div class="bg-gradient-to-r from-green-500 to-teal-500 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-brain text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">AI Assistant</h3>
+                            <p class="text-gray-300">Get intelligent suggestions and productivity tips from our built-in AI chatbot.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-orange-900/50 to-red-900/50 p-6 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-orange-500/50 transition-all duration-300 transform hover:scale-105 floating-animation" style="animation-delay: 1.5s;">
+                            <div class="bg-gradient-to-r from-orange-500 to-red-500 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-mobile-alt text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Responsive Design</h3>
+                            <p class="text-gray-300">Access your tasks anywhere, anytime with our fully responsive interface.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tasks Page -->
+        <div class="page hidden" id="tasks-page">
+            <div class="min-h-screen bg-gray-900 py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4 sm:mb-0">
+                            Daily Tasks
+                        </h1>
+                        <button class="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg" id="add-task-btn">
+                            <i class="fas fa-plus mr-2"></i>Add New Task
+                        </button>
+                    </div>
+
+                    <!-- Task Form -->
+                    <div class="hidden mb-8 animate-slide-up" id="task-form-container">
+                        <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                            <form id="task-form" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Task Title</label>
+                                    <input type="text" id="task-title" name="title" required placeholder="Enter task title..."
+                                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                                    <textarea id="task-description" name="description" rows="3" placeholder="Add a description..."
+                                              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 resize-none transition-all duration-200"></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+                                        <select id="task-priority" name="priority" 
+                                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white">
+                                            <option value="low">Low</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="high">High</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                                        <select id="task-category" name="category"
+                                                class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white">
+                                            <option value="personal" selected>Personal</option>
+                                            <option value="work">Work</option>
+                                            <option value="study">Study</option>
+                                            <option value="health">Health</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-medium transition-all duration-300">
+                                        <i class="fas fa-save mr-2"></i>Save Task
+                                    </button>
+                                    <button type="button" id="cancel-task-btn" class="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition-all duration-300">
+                                        <i class="fas fa-times mr-2"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tasks Filter -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button class="filter-btn px-4 py-2 bg-purple-600 text-white rounded-lg font-medium transition-all duration-300 hover:bg-purple-700 active" data-filter="all">
+                            All Tasks
+                        </button>
+                        <button class="filter-btn px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium transition-all duration-300 hover:bg-gray-600" data-filter="pending">
+                            Pending
+                        </button>
+                        <button class="filter-btn px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium transition-all duration-300 hover:bg-gray-600" data-filter="completed">
+                            Completed
+                        </button>
+                        <button class="filter-btn px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium transition-all duration-300 hover:bg-gray-600" data-filter="high">
+                            High Priority
+                        </button>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <div class="space-y-4" id="tasks-list">
+                        <!-- Empty state -->
+                        <div class="text-center py-12 text-gray-400" id="empty-tasks">
+                            <i class="fas fa-clipboard-list text-6xl mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">No tasks yet</h3>
+                            <p class="mb-4">Start by adding your first task to get organized!</p>
+                            <button class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300" onclick="document.getElementById('add-task-btn').click()">
+                                Add Your First Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Page -->
+        <div class="page hidden" id="progress-page">
+            <div class="min-h-screen bg-gray-900 py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-8 text-center">
+                        Progress Visualization
+                    </h1>
+
+                    <!-- Progress Overview -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                        <div class="bg-gradient-to-br from-green-900/50 to-teal-900/50 p-6 rounded-2xl backdrop-blur-sm border border-green-500/30">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-green-500 p-3 rounded-full">
+                                    <i class="fas fa-check-circle text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-green-400 font-medium">Completed Tasks</h3>
+                                    <span class="text-2xl font-bold text-white" id="completed-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-yellow-900/50 to-orange-900/50 p-6 rounded-2xl backdrop-blur-sm border border-yellow-500/30">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-yellow-500 p-3 rounded-full">
+                                    <i class="fas fa-clock text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-yellow-400 font-medium">Pending Tasks</h3>
+                                    <span class="text-2xl font-bold text-white" id="pending-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-blue-900/50 to-purple-900/50 p-6 rounded-2xl backdrop-blur-sm border border-blue-500/30">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-blue-500 p-3 rounded-full">
+                                    <i class="fas fa-percentage text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-blue-400 font-medium">Completion Rate</h3>
+                                    <span class="text-2xl font-bold text-white" id="completion-rate">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-orange-900/50 to-red-900/50 p-6 rounded-2xl backdrop-blur-sm border border-orange-500/30">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-orange-500 p-3 rounded-full">
+                                    <i class="fas fa-fire text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-orange-400 font-medium">Current Streak</h3>
+                                    <span class="text-2xl font-bold text-white" id="current-streak">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                            <h3 class="text-xl font-bold text-white mb-4">Task Progress Chart</h3>
+                            <div class="chart-container">
+                                <canvas id="progressChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                            <h3 class="text-xl font-bold text-white mb-4">Category Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productivity Suggestions -->
+                    <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                        <h3 class="text-xl font-bold text-white mb-6">Productivity Suggestions</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="suggestions-list">
+                            <!-- Suggestions will be dynamically generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div class="page hidden" id="analytics-page">
+            <div class="min-h-screen bg-gray-900 py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-8 text-center">
+                        Analytics Dashboard
+                    </h1>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                            <h3 class="text-xl font-bold text-white mb-4">Weekly Performance</h3>
+                            <div class="chart-container">
+                                <canvas id="weeklyChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
+                            <h3 class="text-xl font-bold text-white mb-6">Time Management Insights</h3>
+                            <div class="space-y-4" id="insights-list">
+                                <!-- Analytics insights will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div class="page hidden" id="about-page">
+            <div class="min-h-screen bg-gray-900 py-8">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-8 text-center">
+                        About TaskFlow
+                    </h1>
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                            <h3 class="text-2xl font-bold text-white mb-4">Our Mission</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                Many users find it hard to manage daily tasks and track progress. TaskFlow allows users to add, edit, complete, and delete tasks while visualizing progress. It improves personal productivity and time management through intelligent insights and beautiful visualizations.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                            <h3 class="text-2xl font-bold text-white mb-6">Key Features</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">Comprehensive task management system</span>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">Real-time progress tracking</span>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">Interactive data visualizations</span>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">AI-powered productivity suggestions</span>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">Responsive design for all devices</span>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-green-400 text-xl mt-1"></i>
+                                    <span class="text-gray-300">Intelligent chatbot assistance</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                            <h3 class="text-2xl font-bold text-white mb-4">Developer</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                Created by <strong class="text-white">Faizan Khan</strong> - Full Stack Developer passionate about productivity tools and user experience design.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4" id="login-modal">
+        <div class="bg-gray-800 rounded-2xl p-8 w-full max-w-md border border-gray-700 transform transition-all duration-300">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">Login to TaskFlow</h2>
+                <button class="text-gray-400 hover:text-white text-xl" id="close-login-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" name="email" required placeholder="Enter your email"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input type="password" name="password" required placeholder="Enter your password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg font-medium transition-all duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+                <p class="text-center text-gray-400">
+                    Don't have an account? 
+                    <a href="#" class="text-blue-400 hover:text-blue-300" id="switch-to-register">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4" id="register-modal">
+        <div class="bg-gray-800 rounded-2xl p-8 w-full max-w-md border border-gray-700 transform transition-all duration-300">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">Join TaskFlow</h2>
+                <button class="text-gray-400 hover:text-white text-xl" id="close-register-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="register-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                    <input type="text" name="name" required placeholder="Enter your full name"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" name="email" required placeholder="Enter your email"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input type="password" name="password" required placeholder="Create a password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                    <input type="password" name="confirmPassword" required placeholder="Confirm your password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200">
+                </div>
+                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-lg font-medium transition-all duration-300">
+                    <i class="fas fa-user-plus mr-2"></i>Register
+                </button>
+                <p class="text-center text-gray-400">
+                    Already have an account? 
+                    <a href="#" class="text-green-400 hover:text-green-300" id="switch-to-login">Login here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <!-- <div class="fixed bottom-4 right-4 z-40" id="chatbot-container">
+        <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl transition-all duration-300 w-80 h-96" id="chatbot-widget">
+            <div class="flex items-center justify-between p-4 border-b border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-full">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <span class="text-white font-semibold">AI Assistant</span>
+                </div>
+                <button class="text-gray-400 hover:text-white" id="chatbot-toggle">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+            <div class="flex flex-col h-80">
+                <div class="flex-1 p-4 overflow-y-auto" id="chat-messages">
+                    <div class="flex items-start space-x-3 mb-4">
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-full">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-3 max-w-xs">
+                            <p class="text-sm text-white">Hi! I'm your AI productivity assistant. Ask me about task management, productivity tips, or anything related to your goals!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-gray-700">
+                    <div class="flex space-x-2">
+                        <input type="text" placeholder="Ask me anything..." 
+                               class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 text-sm"
+                               id="chat-input">
+                        <button class="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all duration-300"
+                                id="send-chat">
+                            <i class="fas fa-paper-plane text-white text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-lg">
+                            <i class="fas fa-tasks text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">TaskFlow</span>
+                    </div>
+                    <p class="text-gray-400 mb-6">Empowering productivity through intelligent task management and progress tracking.</p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/faizankhan005" target="_blank" class="text-gray-400 hover:text-purple-400 transition-colors">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/faizan05" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="https://instagram.com/ur_faizan05" target="_blank" class="text-gray-400 hover:text-pink-400 transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Contact Info</h3>
+                    <div class="space-y-3">
+                        <a href="mailto:mrfiaznkhan005@gmail.com" class="flex items-center space-x-3 text-gray-400 hover:text-white transition-colors">
+                            <i class="fas fa-envelope"></i>
+                            <span>mrfiaznkhan005@gmail.com</span>
+                        </a>
+                        <a href="tel:+919671636548" class="flex items-center space-x-3 text-gray-400 hover:text-white transition-colors">
+                            <i class="fas fa-phone"></i>
+                            <span>+91 967-163-6548</span>
+                        </a>
+                        <div class="flex items-center space-x-3 text-gray-400">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Gurugram, Haryana, India</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Quick Message</h3>
+                    <form class="space-y-4" id="whatsapp-form">
+                        <input type="text" name="name" placeholder="Your Name" required
+                               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400">
+                        <input type="email" name="email" placeholder="Your Email" required
+                               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400">
+                        <textarea name="message" placeholder="Your Message" rows="3" required
+                                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 resize-none"></textarea>
+                        <button type="submit" class="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-lg font-medium transition-all duration-300">
+                            <i class="fab fa-whatsapp mr-2"></i>Send via WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center">
+                <p class="text-gray-400">&copy; 2024 All rights reserved to <strong class="text-white">Faizan Khan</strong></p>
+                <p class="text-gray-500 mt-1">TaskFlow - Task Manager with Progress Tracker</p>
+            </div>
+        </div>
+    </footer>
+
+   <script src="js/main.js"></script>
+</body>
+</html>
